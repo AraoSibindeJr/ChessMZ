@@ -1,0 +1,30 @@
+# Node Modules
+node_modules/
+npm-debug.log
+package-lock.json
+yarn.lock
+
+#IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Builds
+dist/
+build/
+*.tsbuildinfo
+
+# Misc
+.cache/
+*.log
