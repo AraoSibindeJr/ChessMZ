@@ -4,11 +4,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Cores inspiradas em Moçambique
-        primary: "#007956", // Verde Moçambique
-        accent: "#D4A54B", // Ouro
-        dark: "#2C3E50", // Cinzento escuro
-        light: "#ECF0F1", // Cinzento claro
+        primary: "#007956",
+        accent: "#D4A54B",
+        dark: "#2C3E50",
+        light: "#ECF0F1",
+      },
+      gridTemplateColumns: {
+        8: "repeat(8, minmax(0, 1fr))",
       },
     },
   },
