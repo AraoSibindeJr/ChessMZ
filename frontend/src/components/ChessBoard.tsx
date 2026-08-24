@@ -3,10 +3,18 @@ import { getInitialBoard, indexToPosition } from "../types/chess";
 import Square from "./Square";
 
 interface ChessBoardProps {
+  selectedPosition?: string | null;
+  validMoves?: string[];
+  lastMove?: { from: string; to: string } | null;
   onSquareClick?: (position: string) => void;
 }
 
-export default function ChessBoard({ onSquareClick }: ChessBoardProps) {
+export default function ChessBoard({
+  selectedPosition = null,
+  validMoves = [],
+  lastMove = null,
+  onSquareClick,
+}: ChessBoardProps) {
   const board = getInitialBoard();
 
   // Determinar se quadrado é claro ou escuro
@@ -16,7 +24,7 @@ export default function ChessBoard({ onSquareClick }: ChessBoardProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* Tabuleiro com inline style para garantir grid */}
+      {/* Tabuleiro */}
       <div
         style={{
           display: "grid",
@@ -33,6 +41,12 @@ export default function ChessBoard({ onSquareClick }: ChessBoardProps) {
           row.map((piece, colIndex) => {
             const position = indexToPosition(rowIndex, colIndex);
             const isLight = isLightSquare(rowIndex, colIndex);
+            const isSelected = position === selectedPosition;
+            const isValidMove = validMoves.includes(position);
+            const isLastMoveSquare = Boolean(
+              lastMove &&
+              (position === lastMove.from || position === lastMove.to),
+            );
 
             return (
               <Square
@@ -40,6 +54,9 @@ export default function ChessBoard({ onSquareClick }: ChessBoardProps) {
                 piece={piece}
                 isLight={isLight}
                 position={position}
+                isSelected={isSelected}
+                isValidMove={isValidMove}
+                isLastMove={isLastMoveSquare}
                 onClick={() => onSquareClick?.(position)}
               />
             );
