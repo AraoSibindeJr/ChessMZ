@@ -1,6 +1,8 @@
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
 import MoveNotification from "../components/MoveNotification";
+import GameOverModal from "../components/GameOverModal";
+import CheckIndicator from "../components/CheckIndicator";
 
 export default function GamePage() {
   const {
@@ -11,23 +13,52 @@ export default function GamePage() {
     status,
     currentPlayer,
     selectPosition,
+    isGameOver,
+    isCheck,
   } = useChessGame();
 
   const handleSquareClick = (position: string) => {
-    console.log(`Clicou em: ${position}`);
-    selectPosition(position);
+    if (!isGameOver) {
+      selectPosition(position);
+    }
+  };
+
+  const getCheckPosition = () => {
+    if (!isCheck) return null;
+
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const piece = board[row][col];
+        if (piece && piece.type === "K" && piece.color === currentPlayer) {
+          const files = "abcdefgh";
+          const ranks = "87654321";
+          return `${files[col]}${ranks[row]}`;
+        }
+      }
+    }
+    return null;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark to-primary p-4">
+      {/* Indicador de Xeque */}
+      <CheckIndicator isCheck={isCheck} currentPlayer={currentPlayer} />
+
       {/* Notificação de Movimento */}
       <MoveNotification lastMove={lastMove} currentPlayer={currentPlayer} />
+
+      {/* Modal de Fim de Jogo */}
+      <GameOverModal
+        status={status}
+        currentPlayer={currentPlayer}
+        lastMove={lastMove}
+        onNewGame={() => window.location.reload()} // Reload para nova partida
+      />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">♟️ ChessMZ</h1>
-          <p className="text-light">Plataforma de Xadrez de Moçambique</p>
         </div>
 
         {/* Conteúdo Principal */}
@@ -35,10 +66,11 @@ export default function GamePage() {
           {/* Tabuleiro */}
           <div className="lg:col-span-3 flex justify-center">
             <ChessBoard
-              board={board} // ← ADICIONADO
+              board={board}
               selectedPosition={selectedPosition}
               validMoves={validMoves}
-              lastMove={lastMove}
+              isCheck={isCheck}
+              checkPosition={getCheckPosition()}
               onSquareClick={handleSquareClick}
             />
           </div>
@@ -46,7 +78,7 @@ export default function GamePage() {
           {/* Painel Lateral */}
           <div className="bg-light rounded-lg p-6 shadow-xl h-fit">
             <h2 className="text-2xl font-bold text-dark mb-6 border-b-2 border-primary pb-2">
-              ℹ️ Jogo
+              Jogo
             </h2>
 
             <div className="space-y-6">
@@ -58,10 +90,15 @@ export default function GamePage() {
                 <p className="text-lg font-bold text-accent">
                   {currentPlayer === "white" ? "⚪ Brancas" : "⚫ Pretas"}
                 </p>
+                {isCheck && (
+                  <p className="text-sm text-red-600 mt-2 font-bold">
+                    ⚠️ EM XEQUE!
+                  </p>
+                )}
               </div>
 
               {/* Peça Selecionada */}
-              {selectedPosition && (
+              {selectedPosition && !isGameOver && (
                 <div className="bg-blue-100 rounded p-4 border-l-4 border-blue-500">
                   <p className="text-xs text-gray-600 font-semibold uppercase">
                     Peça Selecionada
@@ -70,10 +107,7 @@ export default function GamePage() {
                     {selectedPosition.toUpperCase()}
                   </p>
                   <p className="text-sm text-gray-700 mt-2">
-                    Movimentos disponíveis: {validMoves.length}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-2">
-                    Clique num quadrado verde para mover
+                    Movimentos: {validMoves.length}
                   </p>
                 </div>
               )}
@@ -95,7 +129,9 @@ export default function GamePage() {
                 className={`rounded p-4 border-l-4 ${
                   status === "ongoing"
                     ? "bg-blue-100 border-blue-500"
-                    : "bg-red-100 border-red-500"
+                    : status === "checkmate"
+                      ? "bg-red-100 border-red-500"
+                      : "bg-orange-100 border-orange-500"
                 }`}
               >
                 <p className="text-xs text-gray-600 font-semibold uppercase">
@@ -103,7 +139,11 @@ export default function GamePage() {
                 </p>
                 <p
                   className={`text-lg font-bold ${
-                    status === "ongoing" ? "text-blue-700" : "text-red-700"
+                    status === "ongoing"
+                      ? "text-blue-700"
+                      : status === "checkmate"
+                        ? "text-red-700"
+                        : "text-orange-700"
                   }`}
                 >
                   {status === "ongoing"
@@ -126,25 +166,26 @@ export default function GamePage() {
               </div>
 
               {/* Botões */}
-              <div className="flex gap-2 pt-4">
-                <button className="flex-1 bg-primary text-white py-2 rounded font-bold hover:bg-opacity-90 transition">
-                  Resign
-                </button>
-                <button className="flex-1 bg-accent text-white py-2 rounded font-bold hover:bg-opacity-90 transition">
-                  Draw
-                </button>
-              </div>
+              {!isGameOver && (
+                <div className="flex gap-2 pt-4">
+                  <button className="flex-1 bg-primary text-white py-2 rounded font-bold hover:bg-opacity-90 transition">
+                    Resign
+                  </button>
+                  <button className="flex-1 bg-accent text-white py-2 rounded font-bold hover:bg-opacity-90 transition">
+                    Draw
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Instruções */}
-        <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-center">
-          <p className="text-sm">
-            ♔ Clique numa peça para seleccionar → Clique num quadrado verde para
-            mover
-          </p>
-        </div>
+        {!isGameOver && (
+          <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-center">
+            <p className="text-sm"></p>
+          </div>
+        )}
       </div>
     </div>
   );

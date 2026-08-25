@@ -7,7 +7,7 @@ interface SquareProps {
   position: string;
   isSelected?: boolean;
   isValidMove?: boolean;
-  isLastMove?: boolean;
+  isCheck?: boolean;
   onClick?: () => void;
 }
 
@@ -17,24 +17,24 @@ export default function Square({
   position,
   isSelected = false,
   isValidMove = false,
-  isLastMove = false,
+  isCheck = false,
   onClick,
 }: SquareProps) {
-  // Cores base (sem alterar)
+  // Cores base
   let bgColor = isLight ? "#F0D9B5" : "#B58863";
 
-  // Cores especiais para seleção e último movimento
-  if (isSelected) {
+  // ✅ Xeque tem prioridade (vermelho)
+  if (isCheck) {
+    bgColor = "#E74C3C"; // Vermelho para xeque
+  } else if (isSelected) {
     bgColor = "#BACA44"; // Verde/amarelo (selecionado)
-  } else if (isLastMove) {
-    bgColor = "#BBE6A3"; // Verde muito claro (último movimento)
   }
+  // ❌ REMOVIDO: else if (isLastMove) - não mais destaque!
 
   // Símbolo da peça
   const symbol = piece ? PIECE_SYMBOLS[piece.color][piece.type] : "";
 
   // Cor do símbolo (contraste melhorado)
-  // ⚠️ IMPORTANTE: Brancas com cor clara, pretas com cor escura
   let pieceColor = "#ffffff"; // Brancas em branco
   let pieceShadow = "0 2px 4px rgba(0,0,0,0.4)";
 
@@ -64,7 +64,8 @@ export default function Square({
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement;
-        if (!isSelected && !isLastMove) {
+        // ✅ Removido: !isLastMove
+        if (!isSelected && !isCheck) {
           el.style.backgroundColor = isLight ? "#E8C86E" : "#A67C52";
           el.style.opacity = "0.8";
         }
@@ -73,17 +74,18 @@ export default function Square({
         const el = e.currentTarget as HTMLDivElement;
         el.style.opacity = "1";
         // Voltar à cor anterior
-        if (isSelected) {
+        if (isCheck) {
+          el.style.backgroundColor = "#E74C3C";
+        } else if (isSelected) {
           el.style.backgroundColor = "#BACA44";
-        } else if (isLastMove) {
-          el.style.backgroundColor = "#BBE6A3";
         } else {
+          // ✅ Volta apenas à cor base (sem lastMove)
           el.style.backgroundColor = isLight ? "#F0D9B5" : "#B58863";
         }
       }}
       data-position={position}
     >
-      {/* ⚠️ Indicador de movimento válido: PEQUENO DOT CENTRAL */}
+      {/* Indicador de movimento válido: PEQUENO DOT CENTRAL */}
       {isValidMove && (
         <div
           style={{
@@ -98,7 +100,7 @@ export default function Square({
         />
       )}
 
-      {/* ⚠️ Indicador de captura: DOT MAIOR COM ANEL */}
+      {/* Indicador de captura: DOT MAIOR COM ANEL */}
       {isValidMove && piece && (
         <div
           style={{
