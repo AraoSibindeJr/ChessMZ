@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Chess } from "chess.js";
-import type { BoardState, Piece, PieceType, PieceColor } from "../types/chess";
-import { getInitialBoard, positionToIndex } from "../types/chess";
+import type { BoardState, Piece, PieceType } from "../types/chess";
+import { getInitialBoard } from "../types/chess";
 
 interface UseChessGameState {
   board: BoardState;
@@ -22,10 +22,12 @@ export function useChessGame() {
     null,
   );
 
+  // ⚠️ IMPORTANTE: Force re-render quando movimento é feito
+  const [gameVersion, setGameVersion] = useState(0);
+
   // Converter estado chess.js para BoardState (8x8 array)
   const board = useMemo<BoardState>(() => {
     const newBoard = getInitialBoard();
-    const fen = chess.fen();
 
     // Limpar tabuleiro
     for (let i = 0; i < 8; i++) {
@@ -34,7 +36,7 @@ export function useChessGame() {
       }
     }
 
-    // Preencher com peças do chess.js
+    // Preencher com peças do chess.js (estado atual)
     const pieces = chess.board();
     pieces.forEach((row, rowIndex) => {
       row.forEach((piece, colIndex) => {
@@ -48,7 +50,7 @@ export function useChessGame() {
     });
 
     return newBoard;
-  }, [chess]);
+  }, [chess, gameVersion]); // ⚠️ Adicionado gameVersion
 
   // Calcular movimentos válidos para posição selecionada
   const validMoves = useMemo<string[]>(() => {
@@ -60,11 +62,56 @@ export function useChessGame() {
     });
 
     return moves.map((move) => move.to);
-  }, [chess, selectedPosition]);
+  }, [chess, selectedPosition, gameVersion]); // ⚠️ Adicionado gameVersion
 
-  // Selecionar peça
+  // Fazer movimento
+  const makeMove = useCallback(
+    (to: string): boolean => {
+      if (!selectedPosition) return false;
+
+      try {
+        const result = chess.move({
+          from: selectedPosition as any,
+          to: to as any,
+          promotion: "q", // Sempre promove para rainha
+        });
+
+        if (result) {
+          setLastMove({ from: selectedPosition, to });
+          setSelectedPosition(null);
+
+          // ⚠️ Force re-render incrementando gameVersion
+          setGameVersion((v) => v + 1);
+
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    },
+    [chess, selectedPosition],
+  );
+
+  // Seleccionar peça
   const selectPosition = useCallback(
     (position: string) => {
+      // Se há movimento selecionado e clica num movimento válido
+      if (selectedPosition) {
+        const moves = chess.moves({
+          square: selectedPosition as any,
+          verbose: true,
+        });
+        const isValidMove = moves.some((m) => m.to === position);
+
+        if (isValidMove) {
+          // Fazer movimento
+          makeMove(position);
+          return;
+        }
+      }
+
+      // Seleccionar peça
       const piece = chess.get(position as any);
 
       // Se clica numa peça do jogador atual
@@ -80,41 +127,19 @@ export function useChessGame() {
         setSelectedPosition(null);
       }
     },
-    [chess, selectedPosition],
-  );
-
-  // Fazer movimento (será usado em Task 7)
-  const makeMove = useCallback(
-    (to: string): boolean => {
-      if (!selectedPosition) return false;
-
-      try {
-        const result = chess.move({
-          from: selectedPosition as any,
-          to: to as any,
-          promotion: "q", // Sempre promove para rainha
-        });
-
-        if (result) {
-          setLastMove({ from: selectedPosition, to });
-          setSelectedPosition(null);
-          return true;
-        }
-        return false;
-      } catch {
-        return false;
-      }
-    },
-    [chess, selectedPosition],
+    [chess, selectedPosition, makeMove],
   );
 
   // Status do jogo
-  const status = useMemo<"ongoing" | "checkmate" | "stalemate" | "draw">(() => {
-    if (chess.isCheckmate()) return "checkmate";
-    if (chess.isStalemate()) return "stalemate";
-    if (chess.isDraw()) return "draw";
-    return "ongoing";
-  }, [chess]);
+  const status = useMemo<"ongoing" | "checkmate" | "stalemate" | "draw">(
+    () => {
+      if (chess.isCheckmate()) return "checkmate";
+      if (chess.isStalemate()) return "stalemate";
+      if (chess.isDraw()) return "draw";
+      return "ongoing";
+    },
+    [chess, gameVersion], // ⚠️ Adicionado gameVersion
+  );
 
   return {
     board,
@@ -122,7 +147,9 @@ export function useChessGame() {
     validMoves,
     lastMove,
     status,
-    currentPlayer: chess.turn() === "w" ? "white" : "black",
+    currentPlayer: (chess.turn() === "w" ? "white" : "black") as
+      | "white"
+      | "black",
     selectPosition,
     makeMove,
     chess, // Para debug

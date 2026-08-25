@@ -1,5 +1,6 @@
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
+import MoveNotification from "../components/MoveNotification";
 
 export default function GamePage() {
   const {
@@ -19,6 +20,9 @@ export default function GamePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark to-primary p-4">
+      {/* Notificação de Movimento */}
+      <MoveNotification lastMove={lastMove} currentPlayer={currentPlayer} />
+
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
@@ -31,6 +35,7 @@ export default function GamePage() {
           {/* Tabuleiro */}
           <div className="lg:col-span-3 flex justify-center">
             <ChessBoard
+              board={board} // ← ADICIONADO
               selectedPosition={selectedPosition}
               validMoves={validMoves}
               lastMove={lastMove}
@@ -65,24 +70,49 @@ export default function GamePage() {
                     {selectedPosition.toUpperCase()}
                   </p>
                   <p className="text-sm text-gray-700 mt-2">
-                    Movimentos: {validMoves.length}
+                    Movimentos disponíveis: {validMoves.length}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Clique num quadrado verde para mover
                   </p>
                 </div>
               )}
 
-              {/* Status */}
-              <div className="bg-green-100 rounded p-4 border-l-4 border-green-500">
+              {/* Último Movimento */}
+              {lastMove && (
+                <div className="bg-green-100 rounded p-4 border-l-4 border-green-500">
+                  <p className="text-xs text-gray-600 font-semibold uppercase">
+                    Último Movimento
+                  </p>
+                  <p className="text-lg font-bold text-green-700">
+                    {lastMove.from.toUpperCase()} → {lastMove.to.toUpperCase()}
+                  </p>
+                </div>
+              )}
+
+              {/* Status do Jogo */}
+              <div
+                className={`rounded p-4 border-l-4 ${
+                  status === "ongoing"
+                    ? "bg-blue-100 border-blue-500"
+                    : "bg-red-100 border-red-500"
+                }`}
+              >
                 <p className="text-xs text-gray-600 font-semibold uppercase">
                   Status
                 </p>
-                <p className="text-lg font-bold text-green-700">
+                <p
+                  className={`text-lg font-bold ${
+                    status === "ongoing" ? "text-blue-700" : "text-red-700"
+                  }`}
+                >
                   {status === "ongoing"
-                    ? "Em Jogo"
+                    ? "Em Jogo ⚔️"
                     : status === "checkmate"
-                      ? "Xeque-mate!"
+                      ? "Xeque-mate! 👑"
                       : status === "stalemate"
-                        ? "Empate (Afogamento)"
-                        : "Empate"}
+                        ? "Empate (Afogamento) 🤝"
+                        : "Empate 🤝"}
                 </p>
               </div>
 
@@ -92,6 +122,7 @@ export default function GamePage() {
                   Seu Rating
                 </p>
                 <p className="text-3xl font-bold text-primary">1200</p>
+                <p className="text-xs text-gray-600 mt-1">Iniciante</p>
               </div>
 
               {/* Botões */}
@@ -105,6 +136,14 @@ export default function GamePage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Instruções */}
+        <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-center">
+          <p className="text-sm">
+            ♔ Clique numa peça para seleccionar → Clique num quadrado verde para
+            mover
+          </p>
         </div>
       </div>
     </div>

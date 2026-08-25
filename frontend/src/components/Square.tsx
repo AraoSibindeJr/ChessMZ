@@ -20,19 +20,28 @@ export default function Square({
   isLastMove = false,
   onClick,
 }: SquareProps) {
-  // Cores base
+  // Cores base (sem alterar)
   let bgColor = isLight ? "#F0D9B5" : "#B58863";
 
-  // Cores especiais
+  // Cores especiais para seleção e último movimento
   if (isSelected) {
     bgColor = "#BACA44"; // Verde/amarelo (selecionado)
-  } else if (isValidMove) {
-    bgColor = "#BDD5AF"; // Verde claro (movimento válido)
   } else if (isLastMove) {
     bgColor = "#BBE6A3"; // Verde muito claro (último movimento)
   }
 
+  // Símbolo da peça
   const symbol = piece ? PIECE_SYMBOLS[piece.color][piece.type] : "";
+
+  // Cor do símbolo (contraste melhorado)
+  // ⚠️ IMPORTANTE: Brancas com cor clara, pretas com cor escura
+  let pieceColor = "#ffffff"; // Brancas em branco
+  let pieceShadow = "0 2px 4px rgba(0,0,0,0.4)";
+
+  if (piece?.color === "black") {
+    pieceColor = "#000000"; // Pretas em preto
+    pieceShadow = "0 2px 4px rgba(255,255,255,0.3)";
+  }
 
   return (
     <div
@@ -55,7 +64,7 @@ export default function Square({
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLDivElement;
-        if (!isSelected && !isValidMove && !isLastMove) {
+        if (!isSelected && !isLastMove) {
           el.style.backgroundColor = isLight ? "#E8C86E" : "#A67C52";
           el.style.opacity = "0.8";
         }
@@ -66,8 +75,6 @@ export default function Square({
         // Voltar à cor anterior
         if (isSelected) {
           el.style.backgroundColor = "#BACA44";
-        } else if (isValidMove) {
-          el.style.backgroundColor = "#BDD5AF";
         } else if (isLastMove) {
           el.style.backgroundColor = "#BBE6A3";
         } else {
@@ -76,39 +83,42 @@ export default function Square({
       }}
       data-position={position}
     >
-      {/* Indicador de movimento válido (círculo pequeno) */}
-      {isValidMove && !piece && (
+      {/* ⚠️ Indicador de movimento válido: PEQUENO DOT CENTRAL */}
+      {isValidMove && (
         <div
           style={{
             position: "absolute",
-            width: "16px",
-            height: "16px",
+            width: "12px",
+            height: "12px",
             borderRadius: "50%",
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            boxShadow: "0 1px 2px rgba(0, 0, 0, 0.3)",
+            zIndex: 1,
           }}
         />
       )}
 
-      {/* Indicador de movimento válido (anel) */}
+      {/* ⚠️ Indicador de captura: DOT MAIOR COM ANEL */}
       {isValidMove && piece && (
         <div
           style={{
             position: "absolute",
-            width: "100%",
-            height: "100%",
-            borderRadius: "4px",
-            border: "3px solid rgba(0, 0, 0, 0.3)",
+            width: "18px",
+            height: "18px",
+            borderRadius: "50%",
+            border: "2px solid rgba(0, 0, 0, 0.4)",
+            backgroundColor: "transparent",
+            zIndex: 1,
           }}
         />
       )}
 
-      {/* Peça */}
+      {/* Peça com contraste melhorado */}
       <span
         style={{
-          textShadow: isLight
-            ? "0 2px 4px rgba(0,0,0,0.2)"
-            : "0 2px 4px rgba(255,255,255,0.2)",
-          filter: piece ? "drop-shadow(0 2px 3px rgba(0,0,0,0.15))" : "none",
+          color: pieceColor,
+          textShadow: pieceShadow,
+          filter: piece ? "drop-shadow(0 2px 3px rgba(0,0,0,0.2))" : "none",
           zIndex: 2,
         }}
       >

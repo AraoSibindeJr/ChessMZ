@@ -1,8 +1,9 @@
 import type { BoardState } from "../types/chess";
-import { getInitialBoard, indexToPosition } from "../types/chess";
+import { indexToPosition } from "../types/chess";
 import Square from "./Square";
 
 interface ChessBoardProps {
+  board: BoardState; // ← ADICIONADO
   selectedPosition?: string | null;
   validMoves?: string[];
   lastMove?: { from: string; to: string } | null;
@@ -10,12 +11,14 @@ interface ChessBoardProps {
 }
 
 export default function ChessBoard({
+  board, // ← ADICIONADO
   selectedPosition = null,
   validMoves = [],
   lastMove = null,
   onSquareClick,
 }: ChessBoardProps) {
-  const board = getInitialBoard();
+  // ⚠️ REMOVIDO: const board = getInitialBoard();
+  // Agora usamos o board passado como prop
 
   // Determinar se quadrado é claro ou escuro
   const isLightSquare = (row: number, col: number): boolean => {
