@@ -1,89 +1,107 @@
 # ChessMZ
 
-Plataforma de xadrez online desenvolvida em Moçambique, com foco em acessibilidade, inclusão digital e desenvolvimento da comunidade de xadrez nacional.
+Plataforma de xadrez desenvolvida para proporcionar uma experiência de jogo de xadrez interactiva e acessível.
 
-> Status: Em desenvolvimento
-> Versão: 0.1.0-alpha
+O projecto encontra-se actualmente na fase de **MVP funcional**, com a implementação da lógica principal de uma partida de xadrez e uma interface web responsiva.
 
-## Sobre o Projecto
+## Estado do Projecto
 
-O ChessMZ é um projecto tecnológico que pretende disponibilizar uma plataforma de xadrez gratuita e acessível a jogadores de diferentes regiões de Moçambique.
+**MVP funcional — Sprint 1 concluído**
 
-O projecto está a ser desenvolvido com foco em uma experiência simples, responsiva e adequada a diferentes condições de acesso à Internet.
+O MVP permite executar partidas completas de xadrez localmente, incluindo validação de movimentos, controlo de turnos, detecção de xeque, xeque-mate e situações de empate.
 
-## Funcionalidades Planeadas
+## Funcionalidades
 
-- Partidas contra computador utilizando Stockfish
-- Partidas online entre jogadores
-- Sistema de rating (Elo)
-- Rankings
-- Histórico de partidas
-- Sistema de autenticação e perfis
-- Interface responsiva
-- Optimização para conexões de Internet limitadas
+- Tabuleiro de xadrez interactivo 8×8
+- Movimentação de peças com validação das regras do xadrez
+- Controlo automático de turnos
+- Detecção de xeque
+- Detecção de xeque-mate
+- Detecção de situações de empate
+- Roque
+- En passant
+- Promoção de peões
+- Indicação do último movimento
+- Interface responsiva para desktop, tablet e dispositivos móveis
+- Comunicação entre frontend e backend através de API HTTP
+- TypeScript em modo strict
 
-> As funcionalidades acima encontram-se em diferentes fases de desenvolvimento e podem ainda não estar disponíveis.
+A validação das regras de xadrez é realizada através da biblioteca `chess.js`.
+
+## Tecnologias
+
+| Camada               | Tecnologia   |
+| -------------------- | ------------ |
+| Frontend             | React        |
+| Build Tool           | Vite         |
+| Linguagem            | TypeScript   |
+| Styling              | Tailwind CSS |
+| Backend              | Express.js   |
+| Chess Logic          | chess.js     |
+| Runtime              | Node.js      |
+| TypeScript Execution | tsx          |
+
+## Arquitectura
+
+O projecto está organizado em duas aplicações principais:
+
+```text
+ChessMZ/
+├── frontend/       # Aplicação React
+├── backend/        # API Express
+├── docs/           # Documentação do projecto
+├── ARCHITECTURE.md # Decisões e estrutura arquitectural
+├── CONTRIBUTING.md # Guia de contribuição
+└── README.md
+```
 
 ## Roadmap
 
-### v0.1 — Foundation
+### Sprint 1 — MVP
 
-- Estrutura inicial do projecto
-- Configuração do frontend e backend
-- Base de dados
-- Tabuleiro de xadrez
-- Regras básicas do jogo
+- [x] Tabuleiro interactivo
+- [x] Movimentação das peças
+- [x] Validação das regras do xadrez
+- [x] Controlo de turnos
+- [x] Xeque
+- [x] Xeque-mate
+- [x] Empates
+- [x] Interface responsiva
 
-### v0.2 — Chess Core
+### Próximas etapas
 
-- Regras completas do xadrez
-- Histórico de movimentos
-- Relógio de jogo
-- PGN
+- [ ] Testes automatizados
+- [ ] Integração com Stockfish
+- [ ] Sistema de rating
+- [ ] Multiplayer em tempo real
+- [ ] Autenticação e contas de utilizador
+- [ ] Perfil e histórico de jogos
+- [ ] Clubes e torneios
+- [ ] Puzzles e funcionalidades de aprendizagem
+- [ ] Aplicação mobile
 
-### v0.3 — Chess AI
+As funcionalidades do roadmap representam objectivos futuros e podem ser alteradas durante o desenvolvimento.
 
-- Integração com Stockfish
-- Diferentes níveis de dificuldade
+## Documentação
 
-### v0.4 — Accounts & Rating
+Documentação adicional disponível no repositório:
 
-- Registo e autenticação
-- Perfis
-- Sistema de rating
-- Histórico de partidas
+- [Arquitectura](./ARCHITECTURE.md)
+- [Guia de Contribuição](./CONTRIBUTING.md)
+- [Product Discovery and Planning](./docs/ChessMZ_Product_Discovery_and_Planning.md)
 
-### v0.5 — Multiplayer
+## Contribuição
 
-- Partidas online
-- Matchmaking
-- Salas de jogo
-- Comunicação em tempo real
+Contribuições são bem-vindas.
 
-### v1.0 — Public Release
-
-- Optimização
-- Segurança
-- Testes
-- Deploy
-- Primeira versão pública
-
-## Desenvolvimento
-
-O ChessMZ encontra-se actualmente em desenvolvimento activo. A arquitectura e as funcionalidades poderão sofrer alterações durante a evolução do projecto.
-
-Para documentação adicional, consulte o directório:
-
-```text
-/docs
-```
-
-## Desenvolvedor
-
-**Arão Sibinde Junior**
-
-Estudante de Ciência da Computação.
+Consulte o [CONTRIBUTING.md](./CONTRIBUTING.md) para obter informações sobre configuração do ambiente, padrões de código e processo de contribuição.
 
 ## Licença
 
-MIT License
+Este projecto está disponível sob a licença MIT.
+
+## Autor
+
+**Arao Sibinde Jr.**
+
+ChessMZ — Plataforma de Xadrez de Moçambique.
