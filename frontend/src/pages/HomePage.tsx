@@ -52,7 +52,6 @@ export default function HomePage() {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-3">
             ♟️ ChessMZ
           </h1>
-          <p className="text-lg md:text-xl text-light">Jogue xadrez agora</p>
         </div>
 
         {/* Botão Principal — Começar a Jogar */}
@@ -72,7 +71,7 @@ export default function HomePage() {
               A carregar...
             </span>
           ) : (
-            "🎮 Começar a Jogar"
+            " Começar Jogo"
           )}
         </button>
 
@@ -97,7 +96,7 @@ export default function HomePage() {
               fontSize: "1rem",
             }}
           >
-            🔄 Tentar Novamente
+            Tentar Novamente
           </button>
         )}
 
@@ -106,7 +105,7 @@ export default function HomePage() {
           {loading ? (
             <p className="text-gray-300 text-sm">Verificando conexão...</p>
           ) : data ? (
-            <p className="text-green-300 text-sm">✓ Sistema pronto</p>
+            <p className="text-green-300 text-sm"> </p>
           ) : error ? (
             <p className="text-orange-300 text-sm">
               Modo offline (dados locais)
