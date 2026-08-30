@@ -1,50 +1,125 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 import { useHealth } from "../hooks/useHealth";
+import LoadingSpinner from "../components/LoadingSpinner";
 
+/**
+ * Página inicial — Homepage.
+ *
+ * Design minimalista com foco na ação principal: "Começar a Jogar".
+ *
+ * Filosofia:
+ * - Remover tudo que não é essencial
+ * - Hierarquia visual clara
+ * - Uma ação principal bem definida
+ * - Responsivo em todos os tamanhos
+ *
+ * @component
+ * @returns {JSX.Element} Homepage renderizada
+ */
 export default function HomePage() {
   const navigate = useNavigate();
-  const { data, loading, error, fetch } = useHealth();
+  const { data, loading, error } = useHealth();
 
-  useEffect(() => {
-    fetch();
-  }, []);
+  // ────────────────────────────────────────────────────────────
+  // HANDLERS
+  // ────────────────────────────────────────────────────────────
+
+  /**
+   * Navega para página de jogo.
+   * Independente do status de conexão (usa mock se necessário).
+   */
+  const handleStartGame = () => {
+    navigate("/game");
+  };
+
+  /**
+   * Recarrega a página para tentar reconectar.
+   */
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
+  // ────────────────────────────────────────────────────────────
+  // RENDER
+  // ────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-dark flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <h1 className="text-3xl font-bold text-dark mb-4 text-center">
-          ♟️ ChessMZ
-        </h1>
-        <p className="text-gray-600 mb-6 text-center">
-          A Maior Plataforma de Xadrez de Moçambique
-        </p>
-
-        {/* Status do Backend */}
-        <div className="mb-6 p-4 bg-gray-100 rounded">
-          <p className="text-sm font-semibold text-dark mb-2">
-            Status Backend:
-          </p>
-          {loading && (
-            <p className="text-blue-600"> Conectando ao servidor...</p>
-          )}
-          {error && <p className="text-red-600"> Erro: {error.message}</p>}
-          {data && (
-            <div>
-              <p className="text-green-600 font-bold">Conectado ao backend!</p>
-              <p className="text-xs text-gray-600 mt-2">
-                Status: {data.data.status}
-              </p>
-            </div>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-dark to-primary p-4 md:p-6 flex flex-col justify-center items-center">
+      {/* Container Principal */}
+      <div className="w-full max-w-lg">
+        {/* Logo & Título */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-3">
+            ♟️ ChessMZ
+          </h1>
+          <p className="text-lg md:text-xl text-light">Jogue xadrez agora</p>
         </div>
 
+        {/* Botão Principal — Começar a Jogar */}
         <button
-          onClick={() => navigate("/game")}
-          className="w-full bg-primary text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-90 transition"
+          onClick={handleStartGame}
+          disabled={loading}
+          className="w-full bg-primary hover:bg-opacity-90 disabled:bg-gray-400 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 ease-out mb-6 shadow-lg hover:shadow-xl active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          style={{
+            fontSize: "1.1rem",
+            minHeight: "56px",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
         >
-          Comece a Jogar
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              A carregar...
+            </span>
+          ) : (
+            "🎮 Começar a Jogar"
+          )}
         </button>
+
+        {/* Estado de Erro */}
+        {error && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <p className="text-red-700 font-semibold text-sm">
+              Não conseguimos conectar ao servidor
+            </p>
+            <p className="text-red-600 text-xs mt-1">
+              Mas pode jogar mesmo assim! Usaremos dados locais.
+            </p>
+          </div>
+        )}
+
+        {/* Botão Tentar Novamente (só aparece em erro) */}
+        {error && (
+          <button
+            onClick={handleRetry}
+            className="w-full bg-accent hover:bg-opacity-90 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 ease-out shadow-md hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent"
+            style={{
+              fontSize: "1rem",
+            }}
+          >
+            🔄 Tentar Novamente
+          </button>
+        )}
+
+        {/* Status Discreto */}
+        <div className="mt-8 text-center">
+          {loading ? (
+            <p className="text-gray-300 text-sm">Verificando conexão...</p>
+          ) : data ? (
+            <p className="text-green-300 text-sm">✓ Sistema pronto</p>
+          ) : error ? (
+            <p className="text-orange-300 text-sm">
+              Modo offline (dados locais)
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="absolute bottom-4 left-0 right-0 text-center">
+        <p className="text-gray-400 text-xs">
+          ChessMZ © 2026 — Jogue xadrez de Moçambique
+        </p>
       </div>
     </div>
   );

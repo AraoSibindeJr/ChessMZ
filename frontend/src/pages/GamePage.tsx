@@ -1,4 +1,5 @@
 import { useChessGame } from "../hooks/useChessGame";
+import { useEffect } from "react"; // ← ADICIONE
 import ChessBoard from "../components/ChessBoard";
 import MoveNotification from "../components/MoveNotification";
 import GameOverModal from "../components/GameOverModal";
@@ -17,15 +18,42 @@ export default function GamePage() {
     isCheck,
   } = useChessGame();
 
+  // ────────────────────────────────────────────────────────────
+  // KEYBOARD SHORTCUTS
+  // ────────────────────────────────────────────────────────────
+
+  /**
+   * Atalhos de teclado:
+   * - ESC: Deseleccionar peça atual
+   */
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // ESC para deseleccionar
+      if (event.key === "Escape" && selectedPosition) {
+        selectPosition(selectedPosition);
+        console.log("✓ Deseleccionado (ESC)");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedPosition, selectPosition]);
+
+  // ────────────────────────────────────────────────────────────
+
   const handleSquareClick = (position: string) => {
     if (!isGameOver) {
       selectPosition(position);
     }
   };
 
+  // Encontrar posição do rei em xeque
   const getCheckPosition = () => {
     if (!isCheck) return null;
-
     for (let row = 0; row < 8; row++) {
       for (let col = 0; col < 8; col++) {
         const piece = board[row][col];
@@ -52,13 +80,14 @@ export default function GamePage() {
         status={status}
         currentPlayer={currentPlayer}
         lastMove={lastMove}
-        onNewGame={() => window.location.reload()} // Reload para nova partida
+        onNewGame={() => window.location.reload()}
       />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">♟️ ChessMZ</h1>
+          <p className="text-light">Plataforma de Xadrez de Moçambique</p>
         </div>
 
         {/* Conteúdo Principal */}
@@ -78,7 +107,7 @@ export default function GamePage() {
           {/* Painel Lateral */}
           <div className="bg-light rounded-lg p-6 shadow-xl h-fit">
             <h2 className="text-2xl font-bold text-dark mb-6 border-b-2 border-primary pb-2">
-              Jogo
+              ℹ️ Jogo
             </h2>
 
             <div className="space-y-6">
@@ -180,10 +209,16 @@ export default function GamePage() {
           </div>
         </div>
 
-        {/* Instruções */}
+        {/* Instruções Melhoradas */}
         {!isGameOver && (
           <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-center">
-            <p className="text-sm"></p>
+            <p className="text-sm font-semibold">
+              ♔ Clique numa peça para seleccionar → Clique num ponto para mover
+            </p>
+            <p className="text-xs text-gray-300 mt-2 flex items-center justify-center gap-2">
+              <kbd className="bg-dark bg-opacity-50 px-2 py-1 rounded">ESC</kbd>
+              para deseleccionar peça
+            </p>
           </div>
         )}
       </div>

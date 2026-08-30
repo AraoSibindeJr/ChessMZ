@@ -1,17 +1,39 @@
-import axios from "axios";
-import type { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
-const api: AxiosInstance = axios.create({
-  baseURL: API_URL,
+/**
+ * Instância de cliente HTTP (axios).
+ * Pré-configurada com:
+ * - Base URL da API
+ * - Headers padrão
+ * - Interceptores JWT e erro 401
+ */
+const apiClient: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Interceptor para adicionar token JWT (depois)
-api.interceptors.request.use((config) => {
+/**
+ * Interceptor para erro 401 (não autorizado).
+ * Se a resposta for 401, redireciona para login (futuro).
+ */
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("Sessão expirada (401) — redirecionando para login");
+      // Futuro: window.location.href = '/login'
+    }
+    return Promise.reject(error);
+  },
+);
+
+/**
+ * Interceptor para adicionar JWT token aos headers.
+ * Futuro: quando sistema de autenticação estiver pronto.
+ */
+apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("authToken");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -19,17 +41,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para erros
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expirado
-      localStorage.removeItem("authToken");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  },
-);
+// ✅ EXPORTAR COMO NAMED EXPORT
+export { apiClient };
 
-export default api;
+// ✅ EXPORTAR COMO DEFAULT EXPORT (compatibilidade)
+export default apiClient;
