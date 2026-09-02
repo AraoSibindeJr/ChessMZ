@@ -208,9 +208,16 @@ export function useChessGame() {
    */
   const selectPosition = useCallback(
     (position: string) => {
-      // Bloquear se jogo terminou
+      // ⚠️ Bloquear se jogo terminou
       if (isGameOver) {
         console.log("Jogo terminado — nenhum movimento permitido");
+        return;
+      }
+
+      // ⚠️ Se clica no mesmo quadrado → deselecciona
+      if (position === selectedPosition) {
+        setSelectedPosition(null);
+        console.log("Peça deseleccionada");
         return;
       }
 
@@ -242,11 +249,6 @@ export function useChessGame() {
           setSelectedPosition(position);
           console.log(`Peça selecionada: ${position}`);
         }
-        // Deseleccionar se clica no mesmo quadrado
-        else if (position === selectedPosition) {
-          setSelectedPosition(null);
-          console.log("Peça deseleccionada");
-        }
         // Deseleccionar se clica noutro lugar
         else {
           setSelectedPosition(null);
@@ -255,7 +257,7 @@ export function useChessGame() {
         console.error("Erro ao seleccionar posição:", error);
       }
     },
-    [chess, selectedPosition, makeMove, isGameOver],
+    [chess, selectedPosition, makeMove, isGameOver], // ⚠️ Adicionar isGameOver
   );
 
   // ────────────────────────────────────────────────────────────
