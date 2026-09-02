@@ -28,3 +28,15 @@ build/
 # Misc
 .cache/
 *.log
+
+# Coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Test results
+test-results/
+junit.xml
+
+# Vitest
+.vitest/
